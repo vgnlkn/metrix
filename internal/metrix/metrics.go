@@ -3,6 +3,7 @@ package metrix
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 type Metrics struct {
@@ -13,6 +14,7 @@ type Metrics struct {
 
 func NewMetrics(name, value, vType string) (Metrics, error) {
 	var v Value = nil
+
 	if vType == TypeGauge {
 		v = NewGaugeValue(value)
 	} else if vType == TypeCounter {
@@ -21,7 +23,7 @@ func NewMetrics(name, value, vType string) (Metrics, error) {
 		return Metrics{}, errors.New("invalid metrics type")
 	}
 
-	if v != nil {
+	if !reflect.ValueOf(v).IsNil() {
 		return Metrics{name, v, vType}, nil
 	}
 

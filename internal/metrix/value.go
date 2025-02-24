@@ -39,11 +39,12 @@ type CounterValue struct {
 }
 
 func NewCounterValue(value string) *CounterValue {
-	v := new(CounterValue)
+	v := CounterValue{Counter(0)}
 	if v.Update(value) != nil {
-		return v
+		return nil
 	}
-	return v
+
+	return &v
 }
 
 func (v *CounterValue) Update(new string) error {

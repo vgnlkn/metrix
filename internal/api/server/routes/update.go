@@ -33,10 +33,11 @@ func (ur UpdateRoute) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
 
-	fmt.Println("======================")
-	ur.storage.PrintStorage()
+	// fmt.Println("======================")
+	// ur.storage.PrintStorage()
 
 }
 

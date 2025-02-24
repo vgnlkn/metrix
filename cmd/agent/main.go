@@ -8,10 +8,17 @@ import (
 	"github.com/vgnlkn/metrix/internal/metrix"
 )
 
+const (
+	DefaultPollInterval   = 2 * time.Second
+	DefaultReportInterval = 10 * time.Second
+)
+
 func main() {
 	gm := make(metrix.GaugeMetrics)
 	cm := make(metrix.CounterMetrics)
 	client := client.NewClient("http://localhost:8080")
+
+	lastReport := time.Now()
 
 	for {
 		if err := metrix.GrabMetrics(&gm, &cm); err != nil {
@@ -21,7 +28,11 @@ func main() {
 		fmt.Println("=====================")
 		time.Sleep(2 * time.Second)
 
-		client.UpdateMetrics(gm, cm)
+		now := time.Now()
+		if now.Sub(lastReport) >= DefaultReportInterval {
+			client.UpdateMetrics(gm, cm)
+			lastReport = time.Now()
+		}
 	}
 
 }

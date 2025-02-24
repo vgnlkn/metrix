@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+type Storage interface {
+	Update(name, value, vType string) error
+	Create(name, value, vType string) error
+}
+
 type MemStorage struct {
 	data []Metrics
 }
