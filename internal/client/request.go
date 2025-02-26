@@ -35,6 +35,7 @@ func (c Client) sendMetric(name, value, vType string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Error")
 		return fmt.Errorf("unexpected http status %s", resp.Status)
 	}
 

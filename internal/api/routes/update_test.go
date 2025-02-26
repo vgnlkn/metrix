@@ -6,12 +6,36 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/vgnlkn/metrix/internal/metrix"
 )
 
+func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
+	req, err := http.NewRequest(method, ts.URL+path, nil)
+	require.NoError(t, err)
+
+	resp, err := ts.Client().Do(req)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	return resp, string(respBody)
+}
+
 func TestUpdateHandler(t *testing.T) {
+	c := chi.NewRouter()
+	storage := metrix.NewMemStorage()
+	ur := NewUpdateRouter(&storage)
+	c.Route(`/`, func(r chi.Router) {
+		ur.Route(r)
+	})
+	ts := httptest.NewServer(c)
+	defer ts.Close()
+
 	type want struct {
 		code        int
 		response    string
@@ -25,7 +49,7 @@ func TestUpdateHandler(t *testing.T) {
 	}{
 		{
 			name:    "Correct gauge metrics",
-			request: "gauge/SomeValue/3.1415",
+			request: "/gauge/1/3.1415",
 			want: want{
 				code:        http.StatusOK,
 				response:    "",
@@ -34,7 +58,7 @@ func TestUpdateHandler(t *testing.T) {
 		},
 		{
 			name:    "Correct counter metrics",
-			request: "counter/SomeValue/100",
+			request: "/counter/2/100",
 			want: want{
 				code:        http.StatusOK,
 				response:    "",
@@ -43,7 +67,7 @@ func TestUpdateHandler(t *testing.T) {
 		},
 		{
 			name:    "Invalid metrics type",
-			request: "int/SomeValue/100",
+			request: "/int/3/100",
 			want: want{
 				code:        http.StatusBadRequest,
 				response:    "error: invalid metrics type\n\r\n",
@@ -52,25 +76,25 @@ func TestUpdateHandler(t *testing.T) {
 		},
 		{
 			name:    "Missing metrics name",
-			request: "gauge/",
+			request: "/gauge/",
 			want: want{
 				code:        http.StatusNotFound,
-				response:    "invalid request\n",
+				response:    "404 page not found\n",
 				contentType: "text/plain; charset=utf-8",
 			},
 		},
 		{
 			name:    "Missing metrics value",
-			request: "gauge/SomeValue",
+			request: "/gauge/SomeValue",
 			want: want{
 				code:        http.StatusNotFound,
-				response:    "invalid request\n",
+				response:    "404 page not found\n",
 				contentType: "text/plain; charset=utf-8",
 			},
 		},
 		{
 			name:    "Invalid counter metrics value",
-			request: "counter/SomeValue/t",
+			request: "/counter/SomeValue/t",
 			want: want{
 				code:        http.StatusBadRequest,
 				response:    "error: invalid metrics value\n\r\n",
@@ -79,7 +103,7 @@ func TestUpdateHandler(t *testing.T) {
 		},
 		{
 			name:    "Invalid gauge metrics value",
-			request: "counter/SomeValue/t",
+			request: "/counter/SomeValue/t",
 			want: want{
 				code:        http.StatusBadRequest,
 				response:    "error: invalid metrics value\n\r\n",
@@ -90,21 +114,9 @@ func TestUpdateHandler(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			storage := metrix.NewMemStorage()
-			pattern, ur := NewUpdateRoute(&storage)
-			request := httptest.NewRequest(http.MethodPost, pattern+test.request, nil)
-			w := httptest.NewRecorder()
-			ur.ServeHTTP(w, request)
-
-			res := w.Result()
-			assert.Equal(t, test.want.code, res.StatusCode)
-
-			defer res.Body.Close()
-			resBody, err := io.ReadAll(res.Body)
-
-			require.NoError(t, err)
-			assert.Equal(t, test.want.contentType, res.Header.Get("Content-Type"))
-			assert.Equal(t, test.want.response, string(resBody))
+			resp, get := testRequest(t, ts, "POST", test.request)
+			assert.Equal(t, test.want.code, resp.StatusCode)
+			assert.Equal(t, test.want.response, get)
 		})
 	}
 }

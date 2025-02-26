@@ -3,16 +3,14 @@ package server
 import (
 	"net/http"
 
-	"github.com/vgnlkn/metrix/internal/api/server/routes"
+	"github.com/vgnlkn/metrix/internal/api/routes"
 	"github.com/vgnlkn/metrix/internal/metrix"
-)
 
-const (
-	home string = "/"
+	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
-	mux     *http.ServeMux
+	mux     *chi.Mux
 	storage metrix.MemStorage
 }
 
@@ -22,12 +20,19 @@ func (s *Server) Run() {
 
 func NewServer() Server {
 	s := Server{
-		http.NewServeMux(),
+		chi.NewRouter(),
 		metrix.NewMemStorage(),
 	}
 
-	p, u := routes.NewUpdateRoute(&s.storage)
-	s.mux.Handle(p, u)
-	s.mux.Handle(home, http.NotFoundHandler())
+	ur := routes.NewUpdateRouter(&s.storage)
+	hr := routes.NewHomeRouter(&s.storage)
+	vr := routes.NewValueRouter(&s.storage)
+
+	s.mux.Route(`/`, func(r chi.Router) {
+		r.Route(`/`, hr.Route)
+		r.Route(`/update`, ur.Route)
+		r.Route(`/value`, vr.Route)
+	})
+
 	return s
 }
