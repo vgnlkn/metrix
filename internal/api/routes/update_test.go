@@ -12,7 +12,7 @@ import (
 	"github.com/vgnlkn/metrix/internal/metrix"
 )
 
-func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.Response, string) {
+func testRequest(t *testing.T, ts *httptest.Server, method, path string) (int, string) {
 	req, err := http.NewRequest(method, ts.URL+path, nil)
 	require.NoError(t, err)
 
@@ -21,9 +21,9 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path string) (*http.
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	return resp, string(respBody)
+	return resp.StatusCode, string(respBody)
 }
 
 func TestUpdateHandler(t *testing.T) {
@@ -114,8 +114,8 @@ func TestUpdateHandler(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			resp, get := testRequest(t, ts, "POST", test.request)
-			assert.Equal(t, test.want.code, resp.StatusCode)
+			code, get := testRequest(t, ts, "POST", test.request)
+			assert.Equal(t, test.want.code, code)
 			assert.Equal(t, test.want.response, get)
 		})
 	}

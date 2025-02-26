@@ -41,8 +41,8 @@ func TestHomeHandler(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			resp, got := testRequest(t, ts, "GET", tt.request)
-			assert.Equal(t, tt.wantCode, resp.StatusCode)
+			code, got := testRequest(t, ts, "GET", tt.request)
+			assert.Equal(t, tt.wantCode, code)
 			assert.Greater(t, len(got), 0)
 		})
 	}
