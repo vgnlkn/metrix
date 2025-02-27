@@ -10,16 +10,18 @@ import (
 )
 
 type Server struct {
+	host    string
 	mux     *chi.Mux
 	storage metrix.MemStorage
 }
 
 func (s *Server) Run() {
-	http.ListenAndServe(`localhost:8080`, s.mux)
+	http.ListenAndServe(s.host, s.mux)
 }
 
-func NewServer() Server {
+func NewServer(host string) Server {
 	s := Server{
+		host,
 		chi.NewRouter(),
 		metrix.NewMemStorage(),
 	}

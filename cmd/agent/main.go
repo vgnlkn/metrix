@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"time"
 
@@ -8,29 +9,34 @@ import (
 	"github.com/vgnlkn/metrix/internal/metrix"
 )
 
-const (
-	DefaultPollInterval   = 2 * time.Second
-	DefaultReportInterval = 10 * time.Second
-)
-
 func main() {
-	gm := make(metrix.GaugeMetrics)
-	cm := make(metrix.CounterMetrics)
-	client := client.NewClient("http://localhost:8080")
+	flag.Parse()
+	gaugeMetrics := make(metrix.GaugeMetrics)
+	counterMetrics := make(metrix.CounterMetrics)
+	client := client.NewClient("http://" + *host)
 
 	lastReport := time.Now()
 
+	reportInt := GetReportInt()
+	pollInt := GetPollInt()
+
+	fmt.Println("Launch params:")
+	fmt.Printf(" - Host: %s\r\n", *host)
+	fmt.Printf(" - Poll interval: %d sec\r\n", pollInt/time.Second)
+	fmt.Printf(" - Report interval: %d sec\r\n", reportInt/time.Second)
+	fmt.Println("=====================")
+
 	for {
-		if err := metrix.GrabMetrics(&gm, &cm); err != nil {
+		if err := metrix.GrabMetrics(&gaugeMetrics, &counterMetrics); err != nil {
 			panic(err.Error())
 		}
-		fmt.Println(gm, cm)
+		fmt.Println(gaugeMetrics, counterMetrics)
 		fmt.Println("=====================")
-		time.Sleep(2 * time.Second)
+		time.Sleep(pollInt)
 
 		now := time.Now()
-		if now.Sub(lastReport) >= DefaultReportInterval {
-			client.UpdateMetrics(gm, cm)
+		if now.Sub(lastReport) >= reportInt {
+			client.UpdateMetrics(gaugeMetrics, counterMetrics)
 			lastReport = time.Now()
 		}
 	}
