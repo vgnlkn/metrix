@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"time"
 
@@ -10,10 +9,10 @@ import (
 )
 
 func main() {
-	flag.Parse()
+	parseFlags()
 	gaugeMetrics := make(metrix.GaugeMetrics)
 	counterMetrics := make(metrix.CounterMetrics)
-	client := client.NewClient("http://" + *host)
+	client := client.NewClient("http://" + host)
 
 	lastReport := time.Now()
 
@@ -21,7 +20,7 @@ func main() {
 	pollInt := GetPollInt()
 
 	fmt.Println("Launch params:")
-	fmt.Printf(" - Host: %s\r\n", *host)
+	fmt.Printf(" - Host: %s\r\n", host)
 	fmt.Printf(" - Poll interval: %d sec\r\n", pollInt/time.Second)
 	fmt.Printf(" - Report interval: %d sec\r\n", reportInt/time.Second)
 	fmt.Println("=====================")
