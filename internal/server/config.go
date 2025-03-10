@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"flag"
@@ -7,9 +7,13 @@ import (
 
 const hostEnvName = "ADDRESS"
 
-var host string
+var (
+	host   string
+	parsed bool = false
+)
 
 func parseFlags() {
+	parsed = true
 	u := os.Getenv(hostEnvName)
 
 	if u == "" {
@@ -19,4 +23,15 @@ func parseFlags() {
 	}
 
 	host = u
+}
+
+type Config struct {
+	Host string
+}
+
+func NewConfig() *Config {
+	if !parsed {
+		parseFlags()
+	}
+	return &Config{Host: host}
 }

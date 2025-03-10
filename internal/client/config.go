@@ -1,10 +1,10 @@
-package main
+package client
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strconv"
-	"time"
 )
 
 const (
@@ -16,22 +16,33 @@ const (
 	DefaultReportInterval = 10
 )
 
+type Config struct {
+	Host           string
+	PollInterval   int
+	ReportInterval int
+}
+
 var (
 	host           string
 	pollInterval   int
 	reportInterval int
+	parsed         bool = false
 )
 
-func parseFlags() {
-	flag.StringVar(&host, "a", "localhost:8080", "server address")
-	flag.IntVar(&pollInterval, "p", DefaultPollInterval, "metrics poll interval")
-	flag.IntVar(&reportInterval, "r", DefaultReportInterval, "metrics report interval")
+func NewConfig() *Config {
+	if !parsed {
+		flag.StringVar(&host, "a", "localhost:8080", "server address")
+		flag.IntVar(&pollInterval, "p", DefaultPollInterval, "metrics poll interval")
+		flag.IntVar(&reportInterval, "r", DefaultReportInterval, "metrics report interval")
 
-	flag.Parse()
-
+		flag.Parse()
+		parsed = true
+		fmt.Println(host, reportInterval, pollInterval)
+	}
 	if addr := os.Getenv(AddressEnvName); addr != "" {
 		host = addr
 	}
+
 	if pollInt := os.Getenv(PollIntEnvName); pollInt != "" {
 		num, err := strconv.Atoi(pollInt)
 		if err != nil {
@@ -39,6 +50,7 @@ func parseFlags() {
 		}
 		pollInterval = num
 	}
+
 	if reportInt := os.Getenv(ReportIntEnvName); reportInt != "" {
 		num, err := strconv.Atoi(reportInt)
 		if err != nil {
@@ -47,12 +59,9 @@ func parseFlags() {
 		reportInterval = num
 	}
 
-}
-
-func GetPollInt() time.Duration {
-	return time.Duration(pollInterval) * time.Second
-}
-
-func GetReportInt() time.Duration {
-	return time.Duration(reportInterval) * time.Second
+	return &Config{
+		Host:           host,
+		PollInterval:   pollInterval,
+		ReportInterval: reportInterval,
+	}
 }
