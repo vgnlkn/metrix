@@ -5,13 +5,13 @@ import (
 	"time"
 
 	"github.com/vgnlkn/metrix/internal/client"
-	"github.com/vgnlkn/metrix/internal/metrix"
+	"github.com/vgnlkn/metrix/internal/entity"
 )
 
 func main() {
 	parseFlags()
-	gaugeMetrics := make(metrix.GaugeMetrics)
-	counterMetrics := make(metrix.CounterMetrics)
+	gaugeMetrics := make(entity.GaugeMetrics)
+	counterMetrics := make(entity.CounterMetrics)
 	client := client.NewClient("http://" + host)
 
 	lastReport := time.Now()
@@ -26,7 +26,7 @@ func main() {
 	fmt.Println("=====================")
 
 	for {
-		if err := metrix.GrabMetrics(&gaugeMetrics, &counterMetrics); err != nil {
+		if err := entity.CollectMetrics(&gaugeMetrics, &counterMetrics); err != nil {
 			panic(err.Error())
 		}
 		fmt.Println(gaugeMetrics, counterMetrics)

@@ -1,4 +1,4 @@
-package metrix
+package entity
 
 const (
 	TypeGauge   string = "gauge"

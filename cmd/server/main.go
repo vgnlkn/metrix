@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/vgnlkn/metrix/internal/api/server"
+	"github.com/vgnlkn/metrix/internal/repository/memstorage"
+	"github.com/vgnlkn/metrix/internal/router"
+	"github.com/vgnlkn/metrix/internal/usecase"
 )
 
 func main() {
@@ -11,6 +14,8 @@ func main() {
 	parseFlags()
 	fmt.Println("Server running on:", host)
 
-	server := server.NewServer(host)
-	server.Run()
+	memstorage := memstorage.NewMemStorage()
+	usecase := usecase.NewMetricsUsecase(memstorage)
+	router := router.NewRouter(usecase)
+	http.ListenAndServe(host, router.Mux)
 }

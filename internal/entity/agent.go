@@ -1,11 +1,16 @@
-package metrix
+package entity
 
 import (
+	"fmt"
 	"math/rand/v2"
 	"runtime"
 )
 
-func GrabMetrics(gm *GaugeMetrics, cm *CounterMetrics) error {
+func CollectMetrics(gm *GaugeMetrics, cm *CounterMetrics) error {
+	if gm == nil || cm == nil {
+		return fmt.Errorf("GrabMetrics: invalid pointer")
+	}
+
 	runtime.GC()
 
 	var stats runtime.MemStats
@@ -40,12 +45,6 @@ func GrabMetrics(gm *GaugeMetrics, cm *CounterMetrics) error {
 	(*gm)[RandomValue] = Gauge(rand.Float64() * (RandValMax - RandValMin))
 
 	(*cm)[PollCount] = 1
-	// _, exists := (*cm)[PollCount]
-	// if !exists {
-
-	// } else {
-	// 	(*cm)[PollCount] += 1
-	// }
 
 	return nil
 }

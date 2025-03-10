@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/vgnlkn/metrix/internal/metrix"
+	"github.com/vgnlkn/metrix/internal/entity"
 )
 
 type Client struct {
@@ -15,13 +15,13 @@ func NewClient(host string) Client {
 	return Client{host}
 }
 
-func (c Client) UpdateMetrics(gm metrix.GaugeMetrics, cm metrix.CounterMetrics) {
+func (c Client) UpdateMetrics(gm entity.GaugeMetrics, cm entity.CounterMetrics) {
 	for name, value := range gm {
-		c.sendMetric(name, fmt.Sprintf("%f", value), metrix.TypeGauge)
+		c.sendMetric(name, fmt.Sprintf("%f", value), entity.TypeGauge)
 	}
 
 	for name, value := range cm {
-		c.sendMetric(name, fmt.Sprintf("%d", value), metrix.TypeCounter)
+		c.sendMetric(name, fmt.Sprintf("%d", value), entity.TypeCounter)
 	}
 
 }

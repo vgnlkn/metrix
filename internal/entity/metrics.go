@@ -1,4 +1,4 @@
-package metrix
+package entity
 
 import (
 	"errors"
@@ -7,19 +7,20 @@ import (
 )
 
 type Metrics struct {
-	Name  string
-	Val   Value
-	vType string
+	Name string
+	Val  Value
+	Type string
 }
 
 func NewMetrics(name, value, vType string) (Metrics, error) {
 	var v Value = nil
 
-	if vType == TypeGauge {
+	switch vType {
+	case TypeGauge:
 		v = NewGaugeValue(value)
-	} else if vType == TypeCounter {
+	case TypeCounter:
 		v = NewCounterValue(value)
-	} else {
+	default:
 		return Metrics{}, errors.New("invalid metrics type")
 	}
 
@@ -31,5 +32,5 @@ func NewMetrics(name, value, vType string) (Metrics, error) {
 }
 
 func (m Metrics) String() string {
-	return fmt.Sprintf("%s : %v", m.Name, m.Val.String())
+	return fmt.Sprintf("%s : %v %v", m.Name, m.Val.String(), m.Type)
 }
