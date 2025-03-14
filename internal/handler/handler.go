@@ -17,7 +17,7 @@ func NewHandlers(mUsecase *usecase.MetricsUsecase) Handlers {
 	return Handlers{mUsecase: mUsecase}
 }
 
-func (h *Handlers) Update(rw http.ResponseWriter, r *http.Request) {
+func (h *Handlers) UpdateMetrics(rw http.ResponseWriter, r *http.Request) {
 	metricsType := chi.URLParam(r, "type")
 	metricsName := chi.URLParam(r, "name")
 	metricsValue := chi.URLParam(r, "value")
@@ -33,7 +33,7 @@ func (h *Handlers) Update(rw http.ResponseWriter, r *http.Request) {
 	rw.WriteHeader(http.StatusOK)
 }
 
-func (h *Handlers) Value(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetMetricValue(w http.ResponseWriter, r *http.Request) {
 	metricsType := chi.URLParam(r, "type")
 	metricsName := chi.URLParam(r, "name")
 
@@ -84,4 +84,7 @@ func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 400)
 		return
 	}
+
+	w.Header().Add("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
 }
