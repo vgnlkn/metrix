@@ -58,6 +58,7 @@ func LoggerMiddleware(logger *zap.Logger) func(http.Handler) http.Handler {
 			routeCtx := chi.RouteContext(r.Context())
 			if routeCtx == nil {
 				logger.Sugar().Errorf("Invalid routeCtx")
+				return
 			}
 
 			endpoint := routeCtx.RoutePath
