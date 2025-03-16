@@ -21,7 +21,7 @@ func TestRouter(t *testing.T) {
 	mockRepo.EXPECT().UpdateMetrics(gomock.Any()).Return(nil)
 
 	usecase := usecase.NewMetricsUsecase(mockRepo)
-	router := NewRouter(usecase)
+	router := NewRouter(usecase, nil)
 
 	ts := httptest.NewServer(router.Mux)
 	defer ts.Close()
