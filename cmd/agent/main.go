@@ -4,15 +4,22 @@ import (
 	"log"
 	"time"
 
-	"github.com/vgnlkn/metrix/internal/client"
+	"github.com/vgnlkn/metrix/internal/agent"
 	"github.com/vgnlkn/metrix/internal/entity"
+	"go.uber.org/zap"
 )
 
 func main() {
-	config := client.NewConfig()
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic("cannot init logger")
+	}
+	defer logger.Sync()
+
+	config := agent.NewConfig()
 	gaugeMetrics := make(entity.GaugeMetrics)
 	counterMetrics := make(entity.CounterMetrics)
-	client := client.NewClient("http://" + config.Host)
+	client := agent.NewClient("http://"+config.Host, logger)
 
 	lastReport := time.Now()
 
@@ -25,7 +32,6 @@ func main() {
 		if err := entity.CollectMetrics(&gaugeMetrics, &counterMetrics); err != nil {
 			panic(err.Error())
 		}
-		log.Println(gaugeMetrics, counterMetrics)
 		time.Sleep(time.Duration(config.PollInterval) * time.Second)
 
 		now := time.Now()

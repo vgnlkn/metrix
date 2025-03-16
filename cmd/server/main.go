@@ -20,7 +20,7 @@ func main() {
 	sugar := logger.Sugar()
 
 	host := server.NewConfig().Host
-	sugar.Infof("Server running on:", host)
+	sugar.Infof("Server running on: %s", host)
 
 	memstorage := memstorage.NewMemStorage()
 	usecase := usecase.NewMetricsUsecase(memstorage)
