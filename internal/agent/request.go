@@ -30,11 +30,11 @@ func (c Client) UpdateMetrics(gm entity.GaugeMetrics, cm entity.CounterMetrics) 
 	update := func(name, value, vType string) {
 		err := c.sendMetric(name, value, vType)
 		if err != nil {
-			log(fmt.Sprintf("error updating metric err is %v", err), name, value)
+			log(fmt.Sprintf("error updating metric err is %v", err), name, vType)
 			return
 		}
 
-		log("successfully updated metric", name, value)
+		log("successfully updated metric", name, vType)
 	}
 
 	for name, value := range gm {
