@@ -81,31 +81,32 @@ func (h *Handlers) parseRequest(rw http.ResponseWriter, r *http.Request) (*api.M
 }
 
 func (h *Handlers) getMetricValueAPI(name, vType string, rw http.ResponseWriter) {
+	rw.Header().Add("Content-Type", "application/json")
+
 	val, err := h.mUsecase.FindMetrics(name, vType)
 	if err != nil {
-		http.Error(rw, "internal server error 3", http.StatusInternalServerError)
+		http.Error(rw, "metric not found", http.StatusBadRequest)
 		return
 	}
 
 	updated, err := api.NewMetricsFromString(name, vType, val)
 	if err != nil {
-		http.Error(rw, "internal server error 4", http.StatusInternalServerError)
+		http.Error(rw, "error creating response", http.StatusInternalServerError)
 		return
 	}
 
 	bytes := updated.ToBytes()
 	if bytes == nil {
-		http.Error(rw, "internal server error 5", http.StatusInternalServerError)
+		http.Error(rw, "error formatting response", http.StatusInternalServerError)
 		return
 	}
 
 	_, err = rw.Write(*bytes)
 	if err != nil {
-		http.Error(rw, "internal server error 6", http.StatusInternalServerError)
+		http.Error(rw, "error writing response", http.StatusInternalServerError)
 		return
 	}
 
-	rw.Header().Add("Content-Type", "application/json")
 	rw.WriteHeader(http.StatusOK)
 }
 
