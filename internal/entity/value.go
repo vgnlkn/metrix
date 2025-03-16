@@ -30,6 +30,10 @@ func (v *GaugeValue) Update(new string) error {
 	return nil
 }
 
+func (v GaugeValue) AsNumber() float64 {
+	return float64(v.value)
+}
+
 func (v *GaugeValue) String() string {
 	return strconv.FormatFloat(float64(v.value), 'f', -1, 64)
 }
@@ -58,4 +62,8 @@ func (v *CounterValue) Update(new string) error {
 
 func (v CounterValue) String() string {
 	return strconv.FormatInt(int64(v.value), 10)
+}
+
+func (v CounterValue) AsNumber() int64 {
+	return int64(v.value)
 }

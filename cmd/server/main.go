@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
 	"net/http"
+
+	"go.uber.org/zap"
 
 	"github.com/vgnlkn/metrix/internal/repository/memstorage"
 	"github.com/vgnlkn/metrix/internal/router"
@@ -11,11 +12,18 @@ import (
 )
 
 func main() {
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic("cannot init logger")
+	}
+	defer logger.Sync()
+	sugar := logger.Sugar()
+
 	host := server.NewConfig().Host
-	log.Println("Server running on:", host)
+	sugar.Infof("Server running on: %s", host)
 
 	memstorage := memstorage.NewMemStorage()
 	usecase := usecase.NewMetricsUsecase(memstorage)
-	router := router.NewRouter(usecase)
+	router := router.NewRouter(usecase, logger)
 	http.ListenAndServe(host, router.Mux)
 }

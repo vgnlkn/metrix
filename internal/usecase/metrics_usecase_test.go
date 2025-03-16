@@ -18,7 +18,7 @@ func TestUpdateMetrics(t *testing.T) {
 	mockRepo.EXPECT().UpdateMetrics(gomock.Any()).Return(nil)
 
 	usecase := NewMetricsUsecase(mockRepo)
-	err := usecase.Update("test", "123", "gauge")
+	err := usecase.UpdateMetrics("test", "123", "gauge")
 	assert.NoError(t, err)
 }
 
@@ -30,7 +30,7 @@ func TestFindMetrics(t *testing.T) {
 	mockRepo.EXPECT().FindMetrics("test", "gauge").Return("123", nil)
 
 	usecase := NewMetricsUsecase(mockRepo)
-	value, err := usecase.Find("test", "gauge")
+	value, err := usecase.FindMetrics("test", "gauge")
 	assert.NoError(t, err)
 	assert.Equal(t, "123", value)
 }
@@ -46,7 +46,7 @@ func TestAllMetrics(t *testing.T) {
 	})
 
 	usecase := NewMetricsUsecase(mockRepo)
-	allMetrics := usecase.All()
+	allMetrics := usecase.AllMetrics()
 	assert.Len(t, allMetrics, 2)
 	assert.Equal(t, "test1", allMetrics[0].Name)
 	assert.Equal(t, "test2", allMetrics[1].Name)

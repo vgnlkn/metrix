@@ -34,7 +34,7 @@ func NewMetricsUsecase(storage MetricsRepository) *MetricsUsecase {
 	return &MetricsUsecase{storage: storage}
 }
 
-func (u *MetricsUsecase) Update(name, value, vType string) error {
+func (u *MetricsUsecase) UpdateMetrics(name, value, vType string) error {
 	metric, err := entity.NewMetrics(name, value, vType)
 	if err != nil {
 		return fmt.Errorf("entity.NewMetrics: %w", err)
@@ -45,11 +45,11 @@ func (u *MetricsUsecase) Update(name, value, vType string) error {
 	return nil
 }
 
-func (u *MetricsUsecase) Find(name, vType string) (string, error) {
+func (u *MetricsUsecase) FindMetrics(name, vType string) (string, error) {
 	return u.storage.FindMetrics(name, vType)
 }
 
-func (u *MetricsUsecase) All() []MetricsAsString {
+func (u *MetricsUsecase) AllMetrics() []MetricsAsString {
 	all := u.storage.All()
 	r := make([]MetricsAsString, 0, len(all))
 	for _, metric := range all {
