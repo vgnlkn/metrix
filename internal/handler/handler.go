@@ -18,7 +18,7 @@ func NewHandlers(mUsecase *usecase.MetricsUsecase) Handlers {
 	return Handlers{mUsecase: mUsecase}
 }
 
-func (h *Handlers) UpdateMetricsViaUrl(rw http.ResponseWriter, r *http.Request) {
+func (h *Handlers) UpdateMetricsViaURL(rw http.ResponseWriter, r *http.Request) {
 	metricsType := chi.URLParam(r, "type")
 	metricsName := chi.URLParam(r, "name")
 	metricsValue := chi.URLParam(r, "value")
@@ -34,7 +34,7 @@ func (h *Handlers) UpdateMetricsViaUrl(rw http.ResponseWriter, r *http.Request) 
 	rw.WriteHeader(http.StatusOK)
 }
 
-func (h *Handlers) UpdateMetricsViaJson(rw http.ResponseWriter, r *http.Request) {
+func (h *Handlers) UpdateMetricsViaJSON(rw http.ResponseWriter, r *http.Request) {
 	m, ok := h.parseRequest(rw, r)
 	if !ok {
 		return
@@ -50,7 +50,7 @@ func (h *Handlers) UpdateMetricsViaJson(rw http.ResponseWriter, r *http.Request)
 	h.getMetricValueAPI(name, vType, rw)
 }
 
-func (h *Handlers) GetMetricValueViaUrl(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetMetricValueViaURL(w http.ResponseWriter, r *http.Request) {
 	metricsType := chi.URLParam(r, "type")
 	metricsName := chi.URLParam(r, "name")
 
@@ -65,7 +65,7 @@ func (h *Handlers) GetMetricValueViaUrl(w http.ResponseWriter, r *http.Request) 
 	fmt.Fprintf(w, "%s", v)
 }
 
-func (h *Handlers) GetMetricValueViaJson(rw http.ResponseWriter, r *http.Request) {
+func (h *Handlers) GetMetricValueViaJSON(rw http.ResponseWriter, r *http.Request) {
 	if m, ok := h.parseRequest(rw, r); ok {
 		h.getMetricValueAPI(m.ID, m.MType, rw)
 	}

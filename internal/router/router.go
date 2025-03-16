@@ -29,12 +29,12 @@ func NewRouter(mUsecase *usecase.MetricsUsecase, logger *zap.Logger) Service {
 	s.Mux.Route(`/`, func(r chi.Router) {
 		r.Get(`/`, s.handler.Home)
 		r.Route(`/value`, func(r chi.Router) {
-			r.Get(`/value/{type}/{name}`, s.handler.GetMetricValueViaUrl)
-			r.Post(`/`, s.handler.GetMetricValueViaJson)
+			r.Post(`/`, s.handler.GetMetricValueViaJSON)
+			r.Get(`/{type}/{name}`, s.handler.GetMetricValueViaURL)
 		})
 		r.Route(`/update`, func(r chi.Router) {
-			r.Post(`/`, s.handler.UpdateMetricsViaJson)
-			r.Post(`/{type}/{name}/{value}`, s.handler.UpdateMetricsViaUrl)
+			r.Post(`/`, s.handler.UpdateMetricsViaJSON)
+			r.Post(`/{type}/{name}/{value}`, s.handler.UpdateMetricsViaURL)
 		})
 	})
 

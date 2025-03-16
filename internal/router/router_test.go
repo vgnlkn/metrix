@@ -49,12 +49,12 @@ func TestRouter(t *testing.T) {
 		return resp.StatusCode, string(respBody)
 	}
 
-	if _, body := testRequest(t, ts, "GET", "/value/gauge/test", nil); body != "1.3" {
-		t.Errorf("expected 1.3, got %s", body)
-	}
-
 	if respCode, _ := testRequest(t, ts, "POST", "/update/gauge/test/1.3", nil); respCode != http.StatusOK {
 		t.Errorf("expected status code 200, got %d", respCode)
+	}
+
+	if _, body := testRequest(t, ts, "GET", "/value/gauge/test", nil); body != "1.3" {
+		t.Errorf("expected 1.3, got %s", body)
 	}
 
 	if respCode, _ := testRequest(t, ts, "POST", "/update/gauge/test/invalid_value", nil); respCode != http.StatusBadRequest {
